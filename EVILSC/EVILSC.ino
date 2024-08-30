@@ -51,3 +51,51 @@ void loop() {
   
 
 }
+
+#define TARGET_ID 0x60
+#define CRC_ENABLED true
+
+void writeMessage(uint8_t)Address) {
+
+  Wire.beginTransmission(TARGET_ID);  // Start I2C transmission
+
+  Wire.write((uint32_t)(TARGET_ID << 1)); // Target ID + Write bit (0)
+
+  OP_RW = 0x0 // Writing Message
+  CRC_EN = 0x1 // Currently enabled?
+  DLEN = 0x1 // Data Length, currently just 4 bytes?
+  MEM_SEC = 0x0 // Unsure what this is
+
+  CONTROL_WORD_0 = OP_RW << 3 + CRC_EN << 2 + DLEN << 1 + MEM_SEC
+
+  Wire.write((uint8_t)(CONTROL_WORD_0)); // Writing First Control Word
+
+  MEM_PAGE = 
+  MEM_ADDR = 
+
+  CONTROL_WORD_1 = 
+
+  Wire.write((uint8_t)(CONTROL_WORD_1)); // Writing Second Control Word
+  
+  Wire.write((uint8_t)(CONTROL_WORD_2)); // Writing Third Control Word
+
+  // Writing Data Bytes to Gate Driver
+  for (uint8_t i = 0; i < dataLength; i++) {
+    Wire.write(data[i]);
+  }
+
+  // Ending Message with Calculated CRC Byte
+  if (CRC_ENABLED) {
+    // Calculating CRC:
+    uint8_t crc = 0;
+    Wire.write(crc);
+  }
+
+  error = Wire.endTransmission();   // no parameter, the I2C bus is releases after this.
+  if(error == 0) {
+    Serial.println("Data Delivered Successfully");
+  } else {
+    Serial.println("Error, data not delivered successfully");
+  }
+
+}
